@@ -6,5 +6,6 @@ export default {
   primary: "#5433FF",
   secondary: "#20BDFF",
   tartiary: "#A5FECB",
-  white: '#fff'
+  white: "#fff",
+  error: "#f9f9f9"
 };
