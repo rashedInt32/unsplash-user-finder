@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 
 import HomeScreen from '../screens/HomeScreen';
+import UserScreen from '../screens/UserScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -13,10 +14,12 @@ const MainStack = createStackNavigator(
   {
     Home: HomeScreen,
   },
+  {
+    User: UserScreen,
+  },
   config
 );
 
 
-MainStack.path = '';
 
 export default MainStack;

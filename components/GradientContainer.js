@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import colors from '../constants/Colors';
 
-export default function GradientContainer({ children }) {
+export function GradientContainer({ children }) {
   return (
     <LinearGradient
       colors={[colors.primary, colors.secondary, colors.tartiary]}
@@ -17,7 +17,6 @@ export default function GradientContainer({ children }) {
 
 const styles = StyleSheet.create({
   gradientContainer: {
-    padding: 15,
     flex: 1
   },
 });

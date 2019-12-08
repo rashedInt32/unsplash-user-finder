@@ -1,75 +1,105 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
-  Image,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   TextInput,
-  Button
+  Button,
+  Keyboard
 } from "react-native";
 
-import GradientContainer from '../components/GradientContainer';
+import colors from "../constants/Colors";
+import { navigationOptions } from "../utils/navigationOptions";
+import { searchUser } from "../api";
 
+import { GradientContainer } from "../components/GradientContainer";
+import { Error } from "../components/Error";
+import { UserCard } from "../components/UserCard";
 
-import colors from '../constants/Colors';
-
-import { MonoText } from '../components/StyledText';
-import { Error } from '../components/Error';
-
-import { navigationOptions } from '../utils/navigationOptions';
-
-export default function HomeScreen() {
+export default function HomeScreen({navigation}) {
   const [state, setState] = useState({
     loading: false,
-    text: '',
+    text: "",
     data: [],
     error: false,
-    errMsg: ''
+    errMsg: "",
+    isEmpty: false
   });
 
   const getUsers = async () => {
-    if (state.text === '')
+    if (state.text === "")
       return setState({
         ...state,
         error: true,
-        errMsg: 'Please type user name first'
+        errMsg: "Please type user name first"
       });
 
+    Keyboard.dismiss();
 
+    const [err, response] = await searchUser(state.text);
+    if (err) return err.response;
+    if (response.data.total === 0)
+      return setState({ ...state, isEmpty: true });
 
+    setState({
+      ...state,
+      error: false,
+      isEmpty: false,
+      data: response.data.results
+    });
   };
+
+  const goToUserPage = user => {
+    console.log(user);
+    navigation.push("User");
+  }
+
   return (
     <View style={styles.container}>
       <GradientContainer>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => setState({ ...state,error: false, text })}
-          value={state.text}
-          placeholder="Type user name here..."
-          placeholderTextColor="#ddd"
-        />
-        <View style={styles.button}>
-          <Button
-            title="Search"
-            color={colors.white}
-            onPress={getUsers}
+        <View style={{ padding: 15 }}>
+          <TextInput
+            style={styles.input}
+            onChangeText={text => setState({ ...state, error: false, isEmpty: false, text })}
+            value={state.text}
+            placeholder="Type user name here..."
+            placeholderTextColor="#ddd"
           />
+          <View style={styles.button}>
+            <Button title="Search" color={colors.white} onPress={getUsers} />
+          </View>
+          <Error error={state.error} msg={state.errMsg} />
         </View>
-        <Error error={state.error} msg={state.errMsg} />
+
+        <ScrollView style={styles.scrollView}>
+          {state.data.length > 0 &&
+            state.data.map(user => {
+              return (
+                <UserCard
+                  onPress={() => goToUserPage(user)}
+                  key={user.id}
+                  profileAvatar={user.profile_image.large}
+                  name={user.name}
+                  location={user.location}
+                />
+              );
+            })}
+          {state.isEmpty ? (
+            <Text style={styles.emptyText}>No user found on this name {state.text}</Text>
+          ) : null}
+        </ScrollView>
       </GradientContainer>
     </View>
   );
 }
 
-HomeScreen.navigationOptions = navigationOptions('Search User');
+HomeScreen.navigationOptions = navigationOptions("Search User");
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff"
   },
   input: {
     height: 40,
@@ -86,5 +116,17 @@ const styles = StyleSheet.create({
     marginTop: 15,
     backgroundColor: colors.secondary,
     borderRadius: 4
+  },
+  scrollView: {
+    flex: 1,
+    marginTop: 5,
+    padding: 15,
+    paddingTop: 0,
+    paddingBottom: 40
+  },
+  emptyText: {
+    fontSize: 30,
+    textAlign: 'center',
+    color: colors.white
   }
 });
