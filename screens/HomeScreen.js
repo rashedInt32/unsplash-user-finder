@@ -50,10 +50,7 @@ export default function HomeScreen({navigation}) {
     });
   };
 
-  const goToUserPage = user => {
-    console.log(user);
-    navigation.push("User");
-  }
+  const goToUserPage = user => navigation.navigate("User", {user});
 
   return (
     <View style={styles.container}>

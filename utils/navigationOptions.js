@@ -9,6 +9,7 @@ export const navigationOptions = (name) => {
     headerTintColor: "#fff",
     headerTitleStyle: {
       fontWeight: "bold"
-    }
+    },
+    headerBackTitle: "Back"
   };
 }
